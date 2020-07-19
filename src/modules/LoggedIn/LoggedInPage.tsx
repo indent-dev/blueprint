@@ -1,6 +1,6 @@
-import React from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
-import ProjectPage from './Project'
+import React from "react";
+import { Switch, Route, Redirect } from "react-router-dom";
+import ProjectPage from "./Project";
 
 const LoggedInPage = () => {
   return (
@@ -8,7 +8,7 @@ const LoggedInPage = () => {
       <Route path="/project" component={ProjectPage} />
       <Redirect to="/project" />
     </Switch>
-  )
-}
+  );
+};
 
-export default LoggedInPage
+export default LoggedInPage;

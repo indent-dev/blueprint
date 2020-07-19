@@ -1,19 +1,19 @@
-import React from 'react'
-import { Card, Row, Col, message } from 'antd'
-import { useProjectSync } from './useProjectSync'
-import { Popconfirm } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import React from "react";
+import { Card, Row, Col, message } from "antd";
+import { useProjectSync } from "./useProjectSync";
+import { Popconfirm } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const ProjectList = () => {
   const confirm = React.useCallback(() => {
-    message.success('Task Deleted');
-  }, [])
+    message.success("Task Deleted");
+  }, []);
 
   const cancel = React.useCallback(() => {
-    message.error('Canceled');
-  }, [])
+    message.error("Canceled");
+  }, []);
 
-  const projectSync = useProjectSync()
+  const projectSync = useProjectSync();
   return (
     <Row style={{ marginTop: 16 }} gutter={[24, 16]}>
       {projectSync.isValidating ? (
@@ -32,10 +32,11 @@ const ProjectList = () => {
           </Col>
         </>
       ) : (
-        projectSync.projects.map((project) => {
+        projectSync.projects.map(project => {
           return (
             <Col span={6} key={project._id}>
-              <Card hoverable
+              <Card
+                hoverable
                 actions={[
                   <Popconfirm
                     title="Are you sure delete this project ?"
@@ -47,11 +48,11 @@ const ProjectList = () => {
                     <a href="#">
                       <DeleteOutlined
                         style={{
-                          fontSize: 20
+                          fontSize: 20,
                         }}
                       />
                     </a>
-                  </Popconfirm>
+                  </Popconfirm>,
                 ]}
               >
                 <Card.Meta
@@ -60,11 +61,11 @@ const ProjectList = () => {
                 />
               </Card>
             </Col>
-          )
+          );
         })
       )}
     </Row>
-  )
-}
+  );
+};
 
-export default ProjectList
+export default ProjectList;
