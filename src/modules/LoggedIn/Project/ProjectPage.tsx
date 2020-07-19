@@ -1,13 +1,13 @@
-import React from 'react'
-import { Layout, Typography, Row, Col } from 'antd'
-import { UserOutlined } from '@ant-design/icons'
-import ProjectForm from './ProjectForm'
-import ProjectList from './ProjectList'
+import React from "react";
+import { Layout, Typography, Row, Col } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+import ProjectForm from "./ProjectForm";
+import ProjectList from "./ProjectList";
 
 const ProjectPage = () => {
   return (
-    <Layout style={{ height: '100vh' }}>
-      <Layout.Header style={{ backgroundColor: '#fff' }}>
+    <Layout style={{ height: "100vh" }}>
+      <Layout.Header style={{ backgroundColor: "#fff" }}>
         <Row align="middle" justify="space-between">
           <Col>
             <Typography.Title level={4}>Blueprint</Typography.Title>
@@ -26,7 +26,7 @@ const ProjectPage = () => {
         <ProjectList />
       </Layout.Content>
     </Layout>
-  )
-}
+  );
+};
 
-export default ProjectPage
+export default ProjectPage;

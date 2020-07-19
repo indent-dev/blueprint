@@ -1,7 +1,7 @@
-import React from 'react'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import AuthPage from './modules/Auth'
-import LoggedInPage from './modules/LoggedIn'
+import React from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import AuthPage from "./modules/Auth";
+import LoggedInPage from "./modules/LoggedIn";
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
         <Route path="/" component={LoggedInPage} />
       </Switch>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
