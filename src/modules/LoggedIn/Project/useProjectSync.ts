@@ -2,7 +2,7 @@ import React from 'react'
 import { useRequest, request } from '../../../utils/request'
 import { notification } from 'antd'
 
-type Project = {
+export type Project = {
   _id: string
   name: string
   description: string
