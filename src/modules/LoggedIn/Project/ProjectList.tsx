@@ -1,19 +1,19 @@
 import React from "react";
-import { Card, Row, Col, message } from "antd";
+import { Card, Row, Col } from "antd";
 import { useProjectSync } from "./useProjectSync";
 import { Popconfirm } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 
 const ProjectList = () => {
-  const confirm = React.useCallback(() => {
-    message.success("Task Deleted");
-  }, []);
-
-  const cancel = React.useCallback(() => {
-    message.error("Canceled");
-  }, []);
-
   const projectSync = useProjectSync();
+
+  const confirm = React.useCallback(
+    (id: string) => {
+      projectSync.deleteProject(id);
+    },
+    [projectSync]
+  );
+
   return (
     <Row style={{ marginTop: 16 }} gutter={[24, 16]}>
       {projectSync.isValidating ? (
@@ -39,19 +39,17 @@ const ProjectList = () => {
                 hoverable
                 actions={[
                   <Popconfirm
+                    okButtonProps={{ loading: projectSync.isMutating }}
                     title="Are you sure delete this project ?"
-                    onConfirm={confirm}
-                    onCancel={cancel}
+                    onConfirm={() => confirm(project._id)}
                     okText="Yes"
                     cancelText="No"
                   >
-                    <a href="#">
-                      <DeleteOutlined
-                        style={{
-                          fontSize: 20,
-                        }}
-                      />
-                    </a>
+                    <DeleteOutlined
+                      style={{
+                        fontSize: 20,
+                      }}
+                    />
                   </Popconfirm>,
                 ]}
               >

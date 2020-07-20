@@ -46,10 +46,5 @@
     "@types/react-router-dom": "^5.1.5",
     "husky": "^4.2.5",
     "prettier": "^2.0.5"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run format"
-    }
   }
 }
