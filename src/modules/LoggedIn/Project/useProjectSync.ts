@@ -1,6 +1,6 @@
 import React from "react";
-import { useRequest, request } from "../../../utils/request";
 import { notification } from "antd";
+import useRequest from "../../../utils/useRequest";
 
 type Project = {
   _id: string;
@@ -23,18 +23,23 @@ type ProjectSyncValue = {
 
 export const useProjectSync = (): ProjectSyncValue => {
   const {
-    data: projects,
+    data,
     isValidating,
     errorValidate,
     mutate,
     isMutating,
     errorMutate,
+    request,
   } = useRequest<Project[]>("/project");
+
+  const projects = React.useMemo(() => {
+    return data || [];
+  }, [data]);
 
   const createProject = React.useCallback(
     async (projectRequest: ProjectRequest) => {
       try {
-        await mutate(async projects => {
+        await mutate(async () => {
           const createdProject = await request.post<Project>(
             "/project",
             projectRequest
@@ -52,13 +57,13 @@ export const useProjectSync = (): ProjectSyncValue => {
         });
       }
     },
-    [mutate]
+    [mutate, projects, request]
   );
 
   const updateProject = React.useCallback(
     async (projectRequest: ProjectRequest, id: string) => {
       try {
-        await mutate(async projects => {
+        await mutate(async () => {
           const updatedProject = await request.put<Project>(
             `/project/${id}`,
             projectRequest
@@ -78,13 +83,13 @@ export const useProjectSync = (): ProjectSyncValue => {
         });
       }
     },
-    [mutate]
+    [mutate, projects, request]
   );
 
   const deleteProject = React.useCallback(
     async (id: string) => {
       try {
-        await mutate(async projects => {
+        await mutate(async () => {
           await request.delete<Project>(`/project/${id}`);
           return projects.filter(project => project._id !== id);
         });
@@ -99,11 +104,11 @@ export const useProjectSync = (): ProjectSyncValue => {
         });
       }
     },
-    [mutate]
+    [mutate, projects, request]
   );
 
   return {
-    projects: projects || [],
+    projects,
     isValidating,
     errorValidate,
     isMutating,
