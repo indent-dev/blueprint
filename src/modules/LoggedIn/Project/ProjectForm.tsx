@@ -21,9 +21,10 @@ const ProjectForm = () => {
   }, []);
 
   const handleSubmit = React.useCallback(
-    async (projectRequest: ProjectRequest) => {
+    async (projectRequest: ProjectRequest, { resetForm }) => {
       await projectSync.createProject(projectRequest);
       toggleModal();
+      resetForm({});
     },
     [projectSync, toggleModal]
   );
