@@ -1,100 +1,83 @@
-import React, { ChangeEvent } from "react";
-import { Button, Modal } from "antd";
+import React from "react";
+import { Button, Modal, Divider, Space } from "antd";
 import { useProjectSync, ProjectRequest, Project } from "./useProjectSync";
+import { Formik } from "formik";
+import * as yup from "yup";
+import { Form, TextField } from "../../../components/FormikWrapper";
 
 type FormProps = {
   visible: boolean;
-  toggleModal: () => void;
+  onToggleModal: () => void;
   project?: Project;
 };
 
 const ProjectForm = (props: FormProps) => {
   const projectSync = useProjectSync();
-  const [newData, setNewData] = React.useState<ProjectRequest>({
-    name: "",
-    description: "",
-  });
+  const [editedProject, setEditedProject] = React.useState<Project>();
 
   React.useEffect(() => {
-    setNewData({
-      name: props.project ? props.project.name : "",
-      description: props.project ? props.project.description : "",
-    });
+    console.log("RENDERED!");
+
+    setEditedProject(props.project);
+    return () => {
+      console.log("UNMOUNTED");
+    };
   }, [props.project]);
 
-  const handleChange = React.useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      setNewData({ ...newData, [event.target.name]: event.target.value });
-    },
-    [newData]
-  );
+  const validationSchema = React.useMemo(() => {
+    return yup.object({
+      name: yup.string().required(),
+      description: yup.string().required(),
+    });
+  }, []);
 
-  const handleSubmit = React.useCallback(async () => {
-    if (props.project)
-      await projectSync.updateProject(newData, props.project._id);
-    else await projectSync.createProject(newData);
-    props.toggleModal();
-  }, [projectSync, props, newData]);
+  const handleSubmit = React.useCallback(
+    async (projectRequest: ProjectRequest) => {
+      if (props.project)
+        await projectSync.updateProject(projectRequest, props.project._id);
+      else await projectSync.createProject(projectRequest);
+      props.onToggleModal();
+    },
+    [projectSync, props]
+  );
 
   return (
     <>
-      <Modal
-        title={props.project ? "Update Project" : "Create Project"}
-        visible={props.visible}
-        onCancel={props.toggleModal}
-        footer={[
-          <Button key="back" onClick={props.toggleModal}>
-            Cancel
-          </Button>,
-          <Button
-            key="Create Project"
-            type="primary"
-            onClick={handleSubmit}
-            loading={projectSync.isMutating}
-          >
-            {props.project ? "Update Project" : "Create Project"}
-          </Button>,
-        ]}
+      <Formik
+        initialValues={{
+          name: editedProject?.name || "",
+          description: editedProject?.description || "",
+        }}
+        onSubmit={handleSubmit}
+        validationSchema={validationSchema}
       >
-        <div style={{ marginBottom: 22 }}>
-          <p style={{ color: "rgba(0, 0, 0, 0.65)", fontSize: 14 }}>
-            Project Name
-          </p>
-          <input
-            type="text"
-            placeholder="Jawa Timur Park"
-            name="name"
-            value={props.project ? props.project.name : ""}
-            onChange={handleChange}
-            style={{
-              border: "1px solid #D9D9D9",
-              outline: "none",
-              borderRadius: 4,
-              fontSize: 14,
-              minWidth: "100%",
-              padding: "5px 12px",
-            }}
-          />
-        </div>
-        <div>
-          <p>Description</p>
-          <input
-            type="text"
-            placeholder="Interactive jawa timur park map for visitor"
-            name="description"
-            value={newData.description}
-            onChange={handleChange}
-            style={{
-              border: "1px solid #D9D9D9",
-              outline: "none",
-              borderRadius: 4,
-              fontSize: 14,
-              minWidth: "100%",
-              padding: "5px 12px",
-            }}
-          />
-        </div>
-      </Modal>
+        <Modal
+          title={props.project ? "Update Project" : "Create Project"}
+          visible={props.visible}
+          onCancel={props.onToggleModal}
+          footer={null}
+        >
+          <Form>
+            <TextField name="name" label="Name" placeholder="Jawa Timur Park" />
+            <TextField
+              name="description"
+              label="Description"
+              placeholder="Interactive jawa timur park map for visitor"
+            />
+            <Divider />
+            <Space>
+              <Button onClick={props.onToggleModal}>Cancel</Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={projectSync.isMutating}
+              >
+                {props.project ? "Update Project" : "Create Project"}
+              </Button>
+            </Space>
+          </Form>
+        </Modal>
+      </Formik>
     </>
   );
 };

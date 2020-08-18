@@ -1,27 +1,31 @@
 import React from "react";
-import { Card, Row, Col, message } from "antd";
+import { Card, Row, Col } from "antd";
 import { useProjectSync, Project } from "./useProjectSync";
 import { Popconfirm } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import ProjectForm from "./ProjectForm";
 
-const ProjectList = () => {
-  const [visible, setVisible] = React.useState<boolean>(false);
-  const [projectProps, setProjectProps] = React.useState<Project>();
+const ProjectList = (props: {
+  onSelect: (project: Project) => void;
+  onToggleModal: () => void;
+}) => {
 
-  const toggleModal = React.useCallback(() => {
-    setVisible((prev) => !prev);
-  }, []);
-
-  const confirm = React.useCallback(() => {
-    message.success("Task Deleted");
-  }, []);
-
-  const cancel = React.useCallback(() => {
-    message.error("Canceled");
-  }, []);
+  const handleEditClick = React.useCallback(
+    (project: Project) => {
+      props.onSelect(project);
+      props.onToggleModal();
+    },
+    [props]
+  );
 
   const projectSync = useProjectSync();
+
+  const confirm = React.useCallback(
+    (id: string) => {
+      projectSync.deleteProject(id);
+    },
+    [projectSync]
+  );
+
   return (
     <Row style={{ marginTop: 16 }} gutter={[24, 16]}>
       {projectSync.isValidating ? (
@@ -47,9 +51,9 @@ const ProjectList = () => {
                 hoverable
                 actions={[
                   <Popconfirm
+                    okButtonProps={{ loading: projectSync.isMutating }}
                     title="Are you sure delete this project ?"
-                    onConfirm={confirm}
-                    onCancel={cancel}
+                    onConfirm={() => confirm(project._id)}
                     okText="Yes"
                     cancelText="No"
                   >
@@ -61,8 +65,7 @@ const ProjectList = () => {
                   </Popconfirm>,
                   <EditOutlined
                     onClick={() => {
-                      setProjectProps(project);
-                      toggleModal();
+                      handleEditClick(project);
                     }}
                   />,
                 ]}
@@ -70,11 +73,6 @@ const ProjectList = () => {
                 <Card.Meta
                   title={project.name}
                   description={project.description}
-                />
-                <ProjectForm
-                  visible={visible}
-                  toggleModal={toggleModal}
-                  project={projectProps}
                 />
               </Card>
             </Col>
