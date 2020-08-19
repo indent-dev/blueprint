@@ -2,7 +2,7 @@ import React from "react";
 import { notification } from "antd";
 import useRequest from "../../../utils/useRequest";
 
-type Project = {
+export type Project = {
   _id: string;
   name: string;
   description: string;
@@ -29,8 +29,10 @@ export const useProjectSync = (): ProjectSyncValue => {
     mutate,
     isMutating,
     errorMutate,
-    request,
-  } = useRequest<Project[]>("/project");
+    request
+  } = useRequest<Project[]>(
+    "/project/?page=1&itemPerPage=10&sortBy=name&sortDirection=asc"
+  );
 
   const projects = React.useMemo(() => {
     return data || [];

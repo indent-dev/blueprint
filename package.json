@@ -11,7 +11,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
-    "@types/yup": "^0.29.3",
+    "@types/yup": "^0.29.5",
     "antd": "^4.4.1",
     "axios": "^0.19.2",
     "formik": "^2.1.5",
@@ -21,7 +21,7 @@
     "react-scripts": "3.4.1",
     "swr": "^0.2.3",
     "typescript": "~3.7.2",
-    "yup": "^0.29.1"
+    "yup": "^0.29.3"
   },
   "scripts": {
     "start": "react-scripts start",

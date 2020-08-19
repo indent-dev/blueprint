@@ -1,13 +1,13 @@
 import React from "react";
-import { Card, Row, Col, Button, Layout } from "antd";
-import { useProjectSync } from "./useProjectSync";
+import { Card, Row, Col, Button } from "antd";
+import { useProjectSync, Project } from "./useProjectSync";
 import { Popconfirm } from "antd";
-import { DeleteOutlined, AlignCenterOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
-const ProjectList = () => {
+const ProjectList = (props: { onEditClick: (project: Project) => void }) => {
   const projectSync = useProjectSync();
 
-  const confirm = React.useCallback(
+  const handleDelete = React.useCallback(
     (id: string) => {
       projectSync.deleteProject(id);
     },
@@ -42,7 +42,7 @@ const ProjectList = () => {
                     <Popconfirm
                       okButtonProps={{ loading: projectSync.isMutating }}
                       title="Are you sure delete this project ?"
-                      onConfirm={() => confirm(project._id)}
+                      onConfirm={() => handleDelete(project._id)}
                       okText="Yes"
                       cancelText="No"
                     >
@@ -52,6 +52,11 @@ const ProjectList = () => {
                         }}
                       />
                     </Popconfirm>,
+                    <EditOutlined
+                      onClick={() => {
+                        props.onEditClick(project);
+                      }}
+                    />,
                   ]}
                 >
                   <Card.Meta
@@ -65,7 +70,7 @@ const ProjectList = () => {
         )}
       </Row>
       <Row style={{ padding: 50 }} align="middle" justify="center">
-        <Button>Show More Project</Button>
+        <Button> Show More Project</Button>
       </Row>
     </>
   );

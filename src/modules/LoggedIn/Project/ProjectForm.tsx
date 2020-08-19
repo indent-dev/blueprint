@@ -1,13 +1,18 @@
 import React from "react";
 import { Button, Modal, Divider, Space } from "antd";
-import { useProjectSync, ProjectRequest } from "./useProjectSync";
-import { Formik } from "formik";
-import * as yup from "yup";
+import { useProjectSync, ProjectRequest, Project } from "./useProjectSync";
+import * as yup from 'yup'
+import {Formik } from 'formik'
 import { Form, TextField } from "../../../components/FormikWrapper";
 
-const ProjectForm = () => {
+type FormProps = {
+  visible: boolean;
+  onToggleModal: () => void;
+  project?: Project;
+};
+
+const ProjectForm = (props: FormProps) => {
   const projectSync = useProjectSync();
-  const [visible, setVisible] = React.useState<boolean>(false);
 
   const validationSchema = React.useMemo(() => {
     return yup.object({
@@ -16,30 +21,28 @@ const ProjectForm = () => {
     });
   }, []);
 
-  const toggleModal = React.useCallback(() => {
-    setVisible(prev => !prev);
-  }, []);
-
-  const handleSubmit = React.useCallback(
-    async (projectRequest: ProjectRequest, { resetForm }) => {
-      await projectSync.createProject(projectRequest);
-      toggleModal();
-      resetForm({});
-    },
-    [projectSync, toggleModal]
-  );
+  const handleSubmit = React.useCallback(async (projectRequest : ProjectRequest) => {
+    if (props.project)
+      await projectSync.updateProject(projectRequest, props.project._id);
+    else await projectSync.createProject(projectRequest);
+    props.onToggleModal();
+  }, [projectSync, props]);
 
   return (
     <>
       <Formik
-        initialValues={{ name: "", description: "" }}
+        enableReinitialize
+        initialValues={{
+          name: props.project?.name || "",
+          description: props.project?.description || "",
+        }}
         onSubmit={handleSubmit}
         validationSchema={validationSchema}
       >
         <Modal
-          title="Create Project"
-          visible={visible}
-          onCancel={toggleModal}
+          title={props.project ? "Update Project" : "Create Project"}
+          visible={props.visible}
+          onCancel={props.onToggleModal}
           footer={null}
         >
           <Form>
@@ -51,22 +54,18 @@ const ProjectForm = () => {
             />
             <Divider />
             <Space>
-              <Button onClick={toggleModal}>Cancel</Button>
+              <Button onClick={props.onToggleModal}>Cancel</Button>
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={projectSync.isMutating}
               >
-                Create Project
+                {props.project ? "Update Project" : "Create Project"}
               </Button>
             </Space>
           </Form>
         </Modal>
       </Formik>
-
-      <Button type="primary" onClick={toggleModal}>
-        Create New Project
-      </Button>
     </>
   );
 };
