@@ -46,7 +46,7 @@ const ProjectList = () => {
                     cancelText="No"
                   >
                     <DeleteOutlined
-                      title="deleteCard"
+                      title="cardDelete"
                       style={{
                         fontSize: 20,
                       }}
