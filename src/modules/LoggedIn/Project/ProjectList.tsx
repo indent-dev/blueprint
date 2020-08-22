@@ -1,23 +1,23 @@
 import React from "react";
 import { Card, Row, Col, Button } from "antd";
-import { useProjectSync, Project } from "./useProjectSync";
+import { useProjectSyncContext, Project } from "./ProjectSyncContext";
 import { Popconfirm } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 const ProjectList = (props: { onEditClick: (project: Project) => void }) => {
-  const projectSync = useProjectSync();
+  const projectSyncContext = useProjectSyncContext();
 
   const handleDelete = React.useCallback(
     (id: string) => {
-      projectSync.deleteProject(id);
+      projectSyncContext.deleteProject(id);
     },
-    [projectSync]
+    [projectSyncContext]
   );
 
   return (
     <>
       <Row style={{ marginTop: 16 }} gutter={[24, 16]}>
-        {projectSync.isValidating ? (
+        {projectSyncContext.isValidating || projectSyncContext.isMutating ? (
           <>
             <Col span={6}>
               <Card loading></Card>
@@ -33,14 +33,14 @@ const ProjectList = (props: { onEditClick: (project: Project) => void }) => {
             </Col>
           </>
         ) : (
-          projectSync.projects.map(project => {
+          projectSyncContext.projects.map(project => {
             return (
               <Col span={6} key={project._id}>
                 <Card
                   hoverable
                   actions={[
                     <Popconfirm
-                      okButtonProps={{ loading: projectSync.isMutating }}
+                      okButtonProps={{ loading: projectSyncContext.isMutating }}
                       title="Are you sure delete this project ?"
                       onConfirm={() => handleDelete(project._id)}
                       okText="Yes"
@@ -69,9 +69,15 @@ const ProjectList = (props: { onEditClick: (project: Project) => void }) => {
           })
         )}
       </Row>
-      <Row style={{ padding: 50 }} align="middle" justify="center">
-        <Button> Show More Project</Button>
-      </Row>
+      {!projectSyncContext.isMutating &&
+        !projectSyncContext.isValidating &&
+        projectSyncContext.hasNextPage && (
+          <Row align="middle" justify="center">
+            <Button onClick={projectSyncContext.loadMoreProject}>
+              Show More Project
+            </Button>
+          </Row>
+        )}
     </>
   );
 };

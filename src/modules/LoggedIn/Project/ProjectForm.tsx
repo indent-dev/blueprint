@@ -1,8 +1,8 @@
 import React from "react";
 import { Button, Modal, Divider, Space } from "antd";
-import { useProjectSync, ProjectRequest, Project } from "./useProjectSync";
-import * as yup from 'yup'
-import {Formik } from 'formik'
+import { useProjectSync, ProjectRequest, Project } from "./ProjectSyncContext";
+import * as yup from "yup";
+import { Formik } from "formik";
 import { Form, TextField } from "../../../components/FormikWrapper";
 
 type FormProps = {
@@ -21,12 +21,15 @@ const ProjectForm = (props: FormProps) => {
     });
   }, []);
 
-  const handleSubmit = React.useCallback(async (projectRequest : ProjectRequest) => {
-    if (props.project)
-      await projectSync.updateProject(projectRequest, props.project._id);
-    else await projectSync.createProject(projectRequest);
-    props.onToggleModal();
-  }, [projectSync, props]);
+  const handleSubmit = React.useCallback(
+    async (projectRequest: ProjectRequest) => {
+      if (props.project)
+        await projectSync.updateProject(projectRequest, props.project._id);
+      else await projectSync.createProject(projectRequest);
+      props.onToggleModal();
+    },
+    [projectSync, props]
+  );
 
   return (
     <>
