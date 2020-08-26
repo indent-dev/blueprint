@@ -25,6 +25,8 @@ type ProjectSyncValue = {
   setSortBy: (sortBy: string) => void;
   sortDirection: "asc" | "desc";
   setSortDirection: (sortDirection: "asc" | "desc") => void;
+  searchByName: string;
+  setSearchByName: (searchByName: string) => void;
 };
 
 export const useProjectSync = (): ProjectSyncValue => {
@@ -32,9 +34,9 @@ export const useProjectSync = (): ProjectSyncValue => {
   const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">(
     "desc"
   );
+  const [searchByName, setSearchByName] = React.useState<string>("");
   const [page, setPage] = React.useState<number>(1);
   const [hasNextPage, setHasNextPage] = React.useState<boolean>(false);
-
   const {
     data,
     isValidating,
@@ -44,7 +46,7 @@ export const useProjectSync = (): ProjectSyncValue => {
     errorMutate,
     request,
   } = useRequest<Project[]>(
-    `/project?page=1&itemPerPage=8&sortBy=${sortBy}&sortDirection=${sortDirection}`
+    `/project?page=1&itemPerPage=8&sortBy=${sortBy}&sortDirection=${sortDirection}&name=${searchByName}`
   );
 
   const projects = React.useMemo(() => {
@@ -171,6 +173,8 @@ export const useProjectSync = (): ProjectSyncValue => {
     setSortBy,
     sortDirection,
     setSortDirection,
+    searchByName,
+    setSearchByName,
   };
 };
 
@@ -187,6 +191,8 @@ const ProjectContext = React.createContext<ProjectSyncValue>({
   setSortBy: () => {},
   sortDirection: "asc",
   setSortDirection: () => {},
+  searchByName: "",
+  setSearchByName: () => {},
 });
 
 export const ProjectProvider = (props: { children: React.ReactNode }) => {

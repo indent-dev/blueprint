@@ -77,6 +77,9 @@ const ProjectFilter = () => {
         <Col>
           <Search
             placeholder="Search Project Name Card"
+            onChange={item =>
+              projectSyncContext.setSearchByName(item.target.value)
+            }
             style={{ width: 200 }}
           />
         </Col>
