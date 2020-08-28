@@ -1,43 +1,43 @@
-import React, { useCallback } from 'react'
-import { Input, Form } from 'antd'
-import { useField } from 'formik'
+import React, { useCallback } from "react";
+import { Input, Form } from "antd";
+import { useField } from "formik";
 
 export const TextField = (props: {
-  label?: React.ReactNode
-  name: string
-  placeholder?: string
-  type?: 'text' | 'password'
+  label?: React.ReactNode;
+  name: string;
+  placeholder?: string;
+  type?: "text" | "password";
 }) => {
-  const [field, meta] = useField({ name: props.name })
+  const [field, meta] = useField({ name: props.name });
   const renderInput = useCallback(() => {
     switch (props.type) {
-      case 'text':
+      case "text":
         return (
           <Input {...field} id={props.name} placeholder={props.placeholder} />
-        )
-      case 'password':
+        );
+      case "password":
         return (
           <Input.Password
             {...field}
             id={props.name}
             placeholder={props.placeholder}
           />
-        )
+        );
       default:
         return (
           <Input {...field} id={props.name} placeholder={props.placeholder} />
-        )
+        );
     }
-  }, [props.type, props.name, props.placeholder, field])
+  }, [props.type, props.name, props.placeholder, field]);
   return (
     <Form.Item
       label={props.label}
       hasFeedback
-      validateStatus={meta.error && 'error'}
+      validateStatus={meta.error && "error"}
       help={meta.error}
       htmlFor={props.name}
     >
       {renderInput()}
     </Form.Item>
-  )
-}
+  );
+};

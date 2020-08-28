@@ -2,7 +2,7 @@ import React from "react";
 import { notification } from "antd";
 import useRequest from "../../../utils/useRequest";
 
-type Project = {
+export type Project = {
   _id: string;
   name: string;
   description: string;
@@ -19,9 +19,22 @@ type ProjectSyncValue = {
   createProject: (projectRequest: ProjectRequest) => Promise<void>;
   updateProject: (projectRequest: ProjectRequest, id: string) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
+  loadMoreProject: () => void;
+  hasNextPage: boolean;
+  sortBy: string;
+  setSortBy: (sortBy: string) => void;
+  sortDirection: "asc" | "desc";
+  setSortDirection: (sortDirection: "asc" | "desc") => void;
 };
 
 export const useProjectSync = (): ProjectSyncValue => {
+  const [sortBy, setSortBy] = React.useState<string>("createdAt");
+  const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">(
+    "desc"
+  );
+  const [page, setPage] = React.useState<number>(1);
+  const [hasNextPage, setHasNextPage] = React.useState<boolean>(false);
+
   const {
     data,
     isValidating,
@@ -30,7 +43,9 @@ export const useProjectSync = (): ProjectSyncValue => {
     isMutating,
     errorMutate,
     request,
-  } = useRequest<Project[]>("/project");
+  } = useRequest<Project[]>(
+    `/project?page=1&itemPerPage=8&sortBy=${sortBy}&sortDirection=${sortDirection}`
+  );
 
   const projects = React.useMemo(() => {
     return data || [];
@@ -107,6 +122,40 @@ export const useProjectSync = (): ProjectSyncValue => {
     [mutate, projects, request]
   );
 
+  const loadMoreProject = React.useCallback(() => {
+    setPage(prev => prev + 1);
+  }, []);
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        await mutate(async () => {
+          const nextPageProjects = await request.get<Project[]>(
+            `/project?page=${page}&itemPerPage=8&sortBy=${sortBy}&sortDirection=${sortDirection}`
+          );
+          return [...projects, ...nextPageProjects];
+        });
+
+        const nextTwoPageProjects = await request.get<Project[]>(
+          `/project?page=${
+            page + 1
+          }&itemPerPage=8&sortBy=${sortBy}&sortDirection=${sortDirection}`
+        );
+        setHasNextPage(nextTwoPageProjects.length > 0);
+      } catch (err) {
+        notification.error({
+          message: "Failed to load project",
+          description: err.message,
+        });
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [sortBy, sortDirection]);
+
   return {
     projects,
     isValidating,
@@ -116,5 +165,37 @@ export const useProjectSync = (): ProjectSyncValue => {
     createProject,
     updateProject,
     deleteProject,
+    loadMoreProject,
+    hasNextPage,
+    sortBy,
+    setSortBy,
+    sortDirection,
+    setSortDirection,
   };
 };
+
+const ProjectContext = React.createContext<ProjectSyncValue>({
+  projects: [],
+  isValidating: false,
+  isMutating: false,
+  createProject: () => new Promise(() => {}),
+  updateProject: () => new Promise(() => {}),
+  deleteProject: () => new Promise(() => {}),
+  loadMoreProject: () => {},
+  hasNextPage: false,
+  sortBy: "",
+  setSortBy: () => {},
+  sortDirection: "asc",
+  setSortDirection: () => {},
+});
+
+export const ProjectProvider = (props: { children: React.ReactNode }) => {
+  const projectSync = useProjectSync();
+  return (
+    <ProjectContext.Provider value={projectSync}>
+      {props.children}
+    </ProjectContext.Provider>
+  );
+};
+
+export const useProjectSyncContext = () => React.useContext(ProjectContext);

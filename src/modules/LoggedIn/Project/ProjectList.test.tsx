@@ -37,7 +37,7 @@ describe("ProjectList", () => {
       put: jest.fn(),
       post: jest.fn(),
     }));
-    const { findByText } = render(<ProjectList />);
+    const { findByText } = render(<ProjectList onEditClick={jest.fn()} />);
     const cardName = await findByText("jatim park map");
     const cardDescription = await findByText("jatim park map description");
     expect(cardName).toBeInTheDocument();
@@ -57,7 +57,9 @@ describe("ProjectList", () => {
       put: jest.fn(),
       post: jest.fn(),
     }));
-    const { findByTitle, findByText } = render(<ProjectList />);
+    const { findByTitle, findByText } = render(
+      <ProjectList onEditClick={jest.fn()} />
+    );
     const cardDelete = await findByTitle("cardDelete");
     act(() => {
       fireEvent.click(cardDelete);

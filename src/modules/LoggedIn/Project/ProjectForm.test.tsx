@@ -23,11 +23,9 @@ Object.defineProperty(window, "matchMedia", {
 
 describe("ProjectForm", () => {
   it("can show error validation if form empty", async () => {
-    const { getByText, findAllByText, findByText } = render(<ProjectForm />);
-    const createButton = getByText("Create New Project");
-    act(() => {
-      fireEvent.click(createButton);
-    });
+    const { findAllByText, findByText } = render(
+      <ProjectForm visible={true} onToggleModal={jest.fn()} />
+    );
 
     const submitButton = (await findAllByText("Create Project")).find(
       el => el.parentElement?.tagName === "BUTTON"
@@ -59,13 +57,9 @@ describe("ProjectForm", () => {
         } as any),
     }));
 
-    const { getByText, findByLabelText, findAllByText, findByText } = render(
-      <ProjectForm />
+    const { findByLabelText, findAllByText, findByText } = render(
+      <ProjectForm visible={true} onToggleModal={jest.fn()} />
     );
-    const createButton = getByText("Create New Project");
-    act(() => {
-      fireEvent.click(createButton);
-    });
 
     const inputName = await findByLabelText("Name");
     const inputDescription = await findByLabelText("Description");
@@ -103,13 +97,9 @@ describe("ProjectForm", () => {
         }),
     }));
 
-    const { getByText, findByLabelText, findAllByText, findByText } = render(
-      <ProjectForm />
+    const { findByLabelText, findAllByText, findByText } = render(
+      <ProjectForm visible={true} onToggleModal={jest.fn()} />
     );
-    const createButton = getByText("Create New Project");
-    act(() => {
-      fireEvent.click(createButton);
-    });
 
     const inputName = await findByLabelText("Name");
     const inputDescription = await findByLabelText("Description");
@@ -132,5 +122,112 @@ describe("ProjectForm", () => {
 
     const failedNotification = await findByText("Project creation failed");
     expect(failedNotification).toBeInTheDocument();
+  });
+
+  it("can show success notification if update project success", async () => {
+    RequestMock.mockImplementation(baseURL => ({
+      baseURL,
+      get: jest.fn(),
+      delete: jest.fn(),
+      put: () =>
+        Promise.resolve({
+          _id: "gaejgea7g8hea",
+          name: "jatim park map",
+          description: "jatim park map description",
+        } as any),
+      post: jest.fn(),
+    }));
+
+    const { findByLabelText, findAllByText, findByText } = render(
+      <ProjectForm
+        visible={true}
+        onToggleModal={jest.fn()}
+        project={{
+          _id: "xvxvx",
+          name: "jatim park map",
+          description: "jatim park map description",
+        }}
+      />
+    );
+
+    const inputName = await findByLabelText("Name");
+    const inputDescription = await findByLabelText("Description");
+    expect(inputName.getAttribute("value")).toEqual("jatim park map");
+    expect(inputDescription.getAttribute("value")).toEqual(
+      "jatim park map description"
+    );
+
+    act(() => {
+      fireEvent.change(inputName, { target: { value: "jatim park map 2" } });
+    });
+    act(() => {
+      fireEvent.change(inputDescription, {
+        target: { value: "jatim park map description 2" },
+      });
+    });
+
+    const submitButton = (await findAllByText("Update Project")).find(
+      el => el.parentElement?.tagName === "BUTTON"
+    )?.parentElement;
+    if (submitButton)
+      act(() => {
+        fireEvent.click(submitButton);
+      });
+
+    const successNotification = await findByText("Project edit success");
+    expect(successNotification).toBeInTheDocument();
+  });
+
+  it("can show success notification if update project failed", async () => {
+    RequestMock.mockImplementation(baseURL => ({
+      baseURL,
+      get: jest.fn(),
+      delete: jest.fn(),
+      put: () =>
+        Promise.reject({
+          status: "error",
+          message: "failed to update project",
+        } as any),
+      post: jest.fn(),
+    }));
+
+    const { findByLabelText, findAllByText, findByText } = render(
+      <ProjectForm
+        visible={true}
+        onToggleModal={jest.fn()}
+        project={{
+          _id: "xvxvx",
+          name: "jatim park map",
+          description: "jatim park map description",
+        }}
+      />
+    );
+
+    const inputName = await findByLabelText("Name");
+    const inputDescription = await findByLabelText("Description");
+    expect(inputName.getAttribute("value")).toEqual("jatim park map");
+    expect(inputDescription.getAttribute("value")).toEqual(
+      "jatim park map description"
+    );
+
+    act(() => {
+      fireEvent.change(inputName, { target: { value: "jatim park map 2" } });
+    });
+    act(() => {
+      fireEvent.change(inputDescription, {
+        target: { value: "jatim park map description 2" },
+      });
+    });
+
+    const submitButton = (await findAllByText("Update Project")).find(
+      el => el.parentElement?.tagName === "BUTTON"
+    )?.parentElement;
+    if (submitButton)
+      act(() => {
+        fireEvent.click(submitButton);
+      });
+
+    const successNotification = await findByText("Project edit failed");
+    expect(successNotification).toBeInTheDocument();
   });
 });
