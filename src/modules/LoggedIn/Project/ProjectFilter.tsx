@@ -57,6 +57,13 @@ const ProjectFilter = () => {
     )?.name;
   }, [projectSyncContext.sortBy, projectSyncContext.sortDirection]);
 
+  const handleQueryChange = React.useCallback(
+    item => {
+      projectSyncContext.setsearchQuery(item.target.value);
+    },
+    [projectSyncContext]
+  );
+
   return (
     <Form>
       <Row gutter={16}>
@@ -77,9 +84,7 @@ const ProjectFilter = () => {
         <Col>
           <Search
             placeholder="Search Project Name Card"
-            onChange={item =>
-              projectSyncContext.setSearchByName(item.target.value)
-            }
+            onChange={handleQueryChange}
             style={{ width: 200 }}
           />
         </Col>
