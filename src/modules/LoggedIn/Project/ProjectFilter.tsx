@@ -34,7 +34,17 @@ const projectSortOptions: ProjectSortOption[] = [
 
 const ProjectFilter = () => {
   const projectSyncContext = useProjectSyncContext();
-
+  const [searchQuery, setsearchQuery] = React.useState<string>(
+    projectSyncContext.searchQuery
+  );
+  React.useEffect(() => {
+    const timeOut = setTimeout(() => {
+      projectSyncContext.setsearchQuery(searchQuery);
+    }, 600);
+    return () => {
+      clearTimeout(timeOut);
+    };
+  }, [searchQuery]);
   const handleSortChange = React.useCallback(
     (sortName: string) => {
       const selectedProjectSortOption = projectSortOptions.find(
@@ -58,10 +68,10 @@ const ProjectFilter = () => {
   }, [projectSyncContext.sortBy, projectSyncContext.sortDirection]);
 
   const handleQueryChange = React.useCallback(
-    item => {
-      projectSyncContext.setsearchQuery(item.target.value);
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setsearchQuery(event.target.value);
     },
-    [projectSyncContext]
+    []
   );
 
   return (
@@ -84,6 +94,7 @@ const ProjectFilter = () => {
         <Col>
           <Search
             placeholder="Search Project Name Card"
+            value={searchQuery}
             onChange={handleQueryChange}
             style={{ width: 200 }}
           />
